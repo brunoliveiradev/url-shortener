@@ -5,6 +5,7 @@ import com.github.vivyteam.exception.UrlNotFoundException;
 import com.github.vivyteam.model.UrlModel;
 import com.github.vivyteam.repository.UrlRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -23,8 +24,7 @@ class UrlShorteningServiceTest {
     private UrlShorteningService urlShorteningService;
 
     private final String originalUrl = "https://goo.gl/maps/pRUToXUPmTvYwyAb9";
-    private final String shortUrl = "https://goo.gl/maps/pRUToXUPmTvYwyAb9";
-    private static final String SHORT_URL = "https://myservicedomain.de/5g2IXsE3vG";
+    private final String shortUrl = "https://myservicedomain.de/5g2IXsE3vG";
 
     @BeforeEach
     public void setUp() {
@@ -34,6 +34,7 @@ class UrlShorteningServiceTest {
     }
 
     @Test
+    @DisplayName("createShortUrl should return a UrlModel with the original and shortened url")
     public void testCreateShortUrl() {
         UrlModel urlModel = new UrlModel(originalUrl, shortUrl);
 
@@ -51,9 +52,8 @@ class UrlShorteningServiceTest {
     }
 
     @Test
+    @DisplayName("findOriginalUrlByShortUrl should return a UrlModel with the original and shortened url")
     public void testFindOriginalUrlByShortUrl() {
-        String originalUrl = "https://example.com";
-        String shortUrl = "https://short.ly/abc123";
         UrlModel urlModel = new UrlModel(originalUrl, shortUrl);
 
         when(urlRepository.findByShortenedUrl(shortUrl)).thenReturn(Mono.just(urlModel));
@@ -65,6 +65,7 @@ class UrlShorteningServiceTest {
     }
 
     @Test
+    @DisplayName("findOriginalUrlByShortUrl should throw an UrlNotFoundException")
     public void testFindOriginalUrlByShortUrlNotFound() {
         when(urlRepository.findByShortenedUrl(shortUrl)).thenReturn(Mono.empty());
 
@@ -74,6 +75,7 @@ class UrlShorteningServiceTest {
     }
 
     @Test
+    @DisplayName("findShortUrlAndRedirect should return a UrlModel with the original and shortened url")
     public void testFindShortUrlAndRedirect() {
         UrlModel urlModel = new UrlModel(originalUrl, shortUrl);
 
@@ -86,6 +88,7 @@ class UrlShorteningServiceTest {
     }
 
     @Test
+    @DisplayName("findShortUrlAndRedirect should throw an UrlNotFoundException")
     public void testFindShortUrlAndRedirectNotFound() {
         when(urlRepository.findByShortenedUrl(shortUrl)).thenReturn(Mono.empty());
 
