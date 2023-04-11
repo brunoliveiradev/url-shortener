@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +13,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -21,22 +22,28 @@ import reactor.test.StepVerifier;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest(properties = "spring.main.allow-bean-definition-overriding=true")
 @Testcontainers
 class RedisUrlRepositoryTest {
 
     @Autowired
     private RedisUrlRepository redisUrlRepository;
+    private UrlModel urlModel;
 
     @Container
     public static GenericContainer<?> redisContainer = new GenericContainer<>("redis:latest")
             .withExposedPorts(6379);
 
+    @DynamicPropertySource
+    private static void registerRedisProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.redis.host", redisContainer::getHost);
+        registry.add("spring.redis.port", () -> redisContainer.getMappedPort(6379).toString());
+    }
+
     @TestConfiguration
     static class TestRedisConfiguration extends RedisConfiguration {
-
-        @Value("${spring.redis.password}")
-        private String redisPassword;
 
         @Bean
         @Primary
@@ -45,16 +52,19 @@ class RedisUrlRepositoryTest {
             int redisContainerPort = redisContainer.getFirstMappedPort();
 
             RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration(redisContainerHost, redisContainerPort);
-            redisConfig.setPassword(redisPassword);
             return new LettuceConnectionFactory(redisConfig);
         }
-
     }
-    private UrlModel urlModel;
 
     @BeforeEach
     void setUp() {
         urlModel = new UrlModel("https://goo.gl/maps/pRUToXUPmTvYwyAb9", "https://myservicedomain.de/" + UUID.randomUUID());
+    }
+
+    @Test
+    @DisplayName("Should check if the Redis container is running")
+    void givenRedisContainerCheckIfItsRunning() {
+        assertTrue(redisContainer.isRunning());
     }
 
     @Test
@@ -103,6 +113,5 @@ class RedisUrlRepositoryTest {
                         foundUrl.shortenedUrl().equals(urlModel.shortenedUrl()))
                 .verifyComplete();
     }
-
 
 }
