@@ -37,7 +37,7 @@ public class RedisUrlRepository implements UrlRepository {
         UrlEntity urlEntity = UrlEntity.fromModel(urlModel);
         LOGGER.debug("Saving URL: {}", urlEntity);
         return reactiveHashOperations.put(REDIS_KEY, urlEntity.getShortenedUrl(), urlEntity)
-                .then(reactiveHashOperations.put(REDIS_KEY_SECONDARY_INDEX, urlEntity.getOriginalUrl().toString(), urlEntity))
+                .then(reactiveHashOperations.put(REDIS_KEY_SECONDARY_INDEX, urlEntity.getOriginalUrl(), urlEntity))
                 .doOnSuccess(success -> LOGGER.debug("URL saved successfully: {}", urlEntity))
                 .thenReturn(urlEntity.toModel());
     }
