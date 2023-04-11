@@ -1,2 +1,43 @@
 server:
   port: 9000
+
+spring:
+  application:
+    name: url-shortener
+  profiles:
+    active: default
+    default: local
+  sleuth:
+    sampler:
+      probability: 1.0
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:my-long-password}
+  data:
+    redis:
+      repositories:
+        enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env,metrics
+      base-path: /actuator
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    com.github.vivyteam.*: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %X{X-B3-TraceId:-} - %msg%n"
+
+app:
+  shortener:
+    url-length: 7
+    domain-url: "https://myservicedomain.de/"
+    cache-expiration-time: PT12H
