@@ -10,13 +10,15 @@ public class UrlEntity {
 
     @Id
     private String id;
-
     private String originalUrl;
     private String shortenedUrl;
 
     public UrlEntity(String originalUrl, String shortenedUrl) {
         this.originalUrl = originalUrl;
         this.shortenedUrl = shortenedUrl;
+    }
+
+    public UrlEntity() {
     }
 
     public UrlModel toModel() {
@@ -27,16 +29,20 @@ public class UrlEntity {
         return new UrlEntity(urlModel.originalUrl(), urlModel.shortenedUrl());
     }
 
-    public String getId() {
-        return id;
-    }
-
     public String getOriginalUrl() {
         return originalUrl;
     }
 
     public String getShortenedUrl() {
         return shortenedUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setOriginalUrl(String originalUrl) {
@@ -46,7 +52,6 @@ public class UrlEntity {
     public void setShortenedUrl(String shortenedUrl) {
         this.shortenedUrl = shortenedUrl;
     }
-
 
     @Override
     public boolean equals(Object o) {
