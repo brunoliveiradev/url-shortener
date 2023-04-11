@@ -34,3 +34,33 @@ The application must have three endpoints:
 - what is the capacity of my service? How much can it handle/scale?
 - service should be observable
 - every decision made regarding the design of the service or the technologies may be questioned later
+
+
+## Solution
+- App is built using Spring Webflux with Reactor, Java 17 and Redis as a database.
+- The Redis and Redis Insight is dockerized and can be run using docker-compose.
+- The app is exposed localy on port 9000. 
+
+#### Endpoints:
+- **POST /shorten-url** - to shorten a given URL - request example bellow
+`````bash    
+curl --request POST \
+    --url http://localhost:9000/shorten-url/ \
+    --header 'Content-Type: application/json' \
+    --header 'accept: application/json' \
+    --data '{
+    "originalUrl": "https://goo.gl/maps/pRUToXUPmTvYwyAb9"
+    }'
+`````
+
+- **GET /original/{shortUrlId}** - to get the original version of the URL, given its shortened version
+`````bash    
+curl --request GET \
+  --url http://localhost:9000/original/5g2IXsE3vG
+`````
+
+- **GET /{shortUrlId}** - to evaluate and redirect the user to the original URL, given the shortened version
+`````bash    
+curl --request GET \
+  --url http://localhost:9000/5g2IXsE3vG
+`````
